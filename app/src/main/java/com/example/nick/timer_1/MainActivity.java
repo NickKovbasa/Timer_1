@@ -3,6 +3,7 @@ package com.example.nick.timer_1;
 import android.annotation.SuppressLint;
 import android.graphics.drawable.AnimationDrawable;
 import android.os.Handler;
+import android.os.PersistableBundle;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -20,6 +21,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     Button btn_start, btn_stop, btn_reset;
 
     Boolean work;
+    Boolean wasRunning;
 
     int seconds;
 
@@ -45,10 +47,26 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         seconds = 0;
 
         work = false;
-
-        onTime();
+        wasRunning = false;
 
         anim.start();
+
+        if (savedInstanceState != null){
+            seconds = savedInstanceState.getInt("seconds");
+            work = savedInstanceState.getBoolean("work");
+            wasRunning = savedInstanceState.getBoolean("wasRunning");
+        }
+
+        onTime();
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putInt("seconds", seconds);
+        outState.putBoolean("work", work);
+        outState.putBoolean("wasRunning", wasRunning);
+
     }
 
     @Override
@@ -114,14 +132,18 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     protected void onResume() {
         super.onResume();
-        if (anim != null && !anim.isRunning())
-            anim.start();
-    }
+        if (wasRunning){
+            work  = true;
+        }
+        }
+
+
 
     @Override
     protected void onPause() {
         super.onPause();
-        if (anim != null && anim.isRunning())
-            anim.stop();
+    wasRunning = work;
+    work = false;
     }
 }
+
